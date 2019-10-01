@@ -1,19 +1,24 @@
 package com.vladsch.clionarduinoplugin.generators.cmake;
 
-import com.vladsch.flexmark.util.IParse;
-import com.vladsch.flexmark.util.IRender;
 import com.vladsch.flexmark.spec.IParseBase;
 import com.vladsch.flexmark.spec.SpecExample;
-import com.vladsch.flexmark.spec.SpecReader;
 import com.vladsch.flexmark.test.ComboSpecTestCase;
-import com.vladsch.flexmark.util.options.DataHolder;
-import com.vladsch.flexmark.util.options.MutableDataSet;
+import com.vladsch.flexmark.util.ast.IParse;
+import com.vladsch.flexmark.util.ast.IRender;
+import com.vladsch.flexmark.util.data.DataHolder;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.junit.runners.Parameterized;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class CMakeBuilderSpecTest extends ComboSpecTestCase {
     private static final String SPEC_RESOURCE = "/cmake_builder_spec.md";
+    public static final String SPEC_FILE_URL = "/Users/vlad/src/projects/CLionArduinoPlugin/test-resources" + SPEC_RESOURCE;
+
     private static final DataHolder OPTIONS = new MutableDataSet()
             .set(CMakeParser.AUTO_CONFIG, true)
             .set(CMakeParser.AST_LINE_END_EOL, true)
@@ -107,21 +112,12 @@ public class CMakeBuilderSpecTest extends ComboSpecTestCase {
     }
 
     public CMakeBuilderSpecTest(SpecExample example) {
-        super(example);
+        super(example.withFileUrl(SPEC_FILE_URL));
     }
 
     @Parameterized.Parameters(name = "{0}")
     public static List<Object[]> data() {
-        List<SpecExample> examples = SpecReader.readExamples(SPEC_RESOURCE);
-        List<Object[]> data = new ArrayList<Object[]>();
-
-        // NULL example runs full spec test
-        data.add(new Object[] { SpecExample.NULL });
-
-        for (SpecExample example : examples) {
-            data.add(new Object[] { example });
-        }
-        return data;
+        return getTestData(SPEC_RESOURCE, SPEC_FILE_URL);
     }
 
     @Override

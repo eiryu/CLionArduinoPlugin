@@ -1,10 +1,13 @@
 package com.vladsch.clionarduinoplugin.generators.cmake;
 
-import com.vladsch.flexmark.util.options.DataHolder;
-import com.vladsch.flexmark.util.options.MutableDataHolder;
-import com.vladsch.flexmark.util.options.MutableDataSetter;
+import com.vladsch.flexmark.util.data.DataHolder;
+import com.vladsch.flexmark.util.data.MutableDataHolder;
+import com.vladsch.flexmark.util.data.MutableDataSetter;
+import com.vladsch.flexmark.util.html.LineFormattingAppendable;
 
 import java.util.Set;
+
+import static com.vladsch.clionarduinoplugin.generators.cmake.CMakeFormatter.FORMAT_FLAGS;
 
 public class CMakeFormatterOptions implements MutableDataSetter {
     public int indentSpaces;
@@ -50,14 +53,23 @@ public class CMakeFormatterOptions implements MutableDataSetter {
         argumentSeparator = CMakeFormatter.ARGUMENT_SEPARATOR.getFrom(options);
         argumentParensSeparator = CMakeFormatter.ARGUMENT_PARENS_SEPARATOR.getFrom(options);
         argumentListMaxLine = CMakeFormatter.ARGUMENT_LIST_MAX_LINE.getFrom(options);
-        formatFlags = CMakeFormatter.FORMAT_FLAGS.getFrom(options);
+
         maxBlankLines = CMakeFormatter.MAX_BLANK_LINES.getFrom(options);
         maxTrailingBlankLines = CMakeFormatter.MAX_TRAILING_BLANK_LINES.getFrom(options);
+
         spaceAfterCommandName = CMakeFormatter.SPACE_AFTER_COMMAND_NAME.getFrom(options);
         collapseWhitespace = CMakeFormatter.COLLAPSE_WHITESPACE.getFrom(options);
         preserveWhitespace = CMakeFormatter.PRESERVE_WHITESPACE.getFrom(options);
         preserveArgumentSeparator = CMakeFormatter.PRESERVE_ARGUMENT_SEPARATOR.getFrom(options);
         preserveLineBreaks = CMakeFormatter.PRESERVE_LINE_BREAKS.getFrom(options);
+
+        int formatFlags = FORMAT_FLAGS.getFrom(options);
+        if (preserveWhitespace) {
+            formatFlags |= LineFormattingAppendable.ALLOW_LEADING_WHITESPACE;
+            formatFlags &= ~LineFormattingAppendable.COLLAPSE_WHITESPACE;
+        } else if (collapseWhitespace) formatFlags |= LineFormattingAppendable.COLLAPSE_WHITESPACE;
+
+        this.formatFlags = formatFlags;
     }
 
     @Override
@@ -68,7 +80,7 @@ public class CMakeFormatterOptions implements MutableDataSetter {
         dataHolder.set(CMakeFormatter.ARGUMENT_SEPARATOR, argumentSeparator);
         dataHolder.set(CMakeFormatter.ARGUMENT_PARENS_SEPARATOR, argumentParensSeparator);
         dataHolder.set(CMakeFormatter.ARGUMENT_LIST_MAX_LINE, argumentListMaxLine);
-        dataHolder.set(CMakeFormatter.FORMAT_FLAGS, formatFlags);
+        dataHolder.set(FORMAT_FLAGS, formatFlags);
         dataHolder.set(CMakeFormatter.MAX_BLANK_LINES, maxBlankLines);
         dataHolder.set(CMakeFormatter.MAX_TRAILING_BLANK_LINES, maxTrailingBlankLines);
         dataHolder.set(CMakeFormatter.SPACE_AFTER_COMMAND_NAME, spaceAfterCommandName);

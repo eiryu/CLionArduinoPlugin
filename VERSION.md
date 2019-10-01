@@ -4,6 +4,7 @@
 
 ### Version History
 - [TO DO](#to-do)
+- [1.4.9](#149)
 - [1.4.6](#146)
 - [1.4.4](#144)
 - [1.4.2](#142)
@@ -36,10 +37,17 @@
   * [ ] [Support for ESP32 using Arduino libs]
   * [ ] [Include directories when setting up the library. Added Servo_RECURSE.]
 
+### 1.4.9
+
+* Fix: update for latest flexmark-java lib 0.60.0
+* [ ] Fix: add logic to allow for absolute additional library paths  
+  [ArduinoCMakeListsTxtBuilder.kt: Line 213](https://github.com/vsch/CLionArduinoPlugin/blob/master/src/com/vladsch/clionarduinoplugin/generators/cmake/ArduinoCMakeListsTxtBuilder.kt#L213)
+* [ ] Add: documentation for Windows installation to readme
+
 ### 1.4.6
 
 * Fix: update to latest libs
-* Fix: templates 
+* Fix: templates
   * `#ifdef` to `#ifndef`
   * remove `User_Setup.h`
   * add `README.md` to arduino library template
@@ -48,7 +56,7 @@
 ### 1.4.4
 
 * Change: refactoring to updated plugin-util
-* Fix: `Disconnect on build` project setting was not saved, broken in 1.4.0 
+* Fix: `Disconnect on build` project setting was not saved, broken in 1.4.0
 * Add: `On Disconnect Delay`, 50ms default. Introduces a short (0-100ms) delay before a build
   when disconnecting a port to allow the port to become available. On projects with very short
   build times, disconnecting a port does not allow enough time for the port to become available,
@@ -137,7 +145,7 @@
 * Add: options for arduino library project:
   * Add: library test cpp file
   * Add: options for `library.properties`
-    * Add: library category dropdown.  
+    * Add: library category dropdown.
       ![Screenshot_Categories](assets/images/Screenshot_Categories.png)
     * Add: author name and e-mail
 * Fix: language standard missing option if none was previously selected or persisted option was
@@ -156,9 +164,9 @@
 * Fix: change plugin name for JetBrains requirements
 * Fix: reload CMakeLists.txt after project creation otherwise generated files don't have the
   `-mmcu` set.
-* Fix: add port drop down using jssc https://github.com/scream3r/java-simple-serial-connector,
+* Fix: add port drop down using jssc <https://github.com/scream3r/java-simple-serial-connector>,
   with `SerialPorts` Patched for Arduino by Cristian Maglie
-  https://raw.githubusercontent.com/arduino/Arduino/master/arduino-core/src/processing/app/SerialPortList.java
+  <https://raw.githubusercontent.com/arduino/Arduino/master/arduino-core/src/processing/app/SerialPortList.java>
 * Fix: change source packages to match plugin id.
 * Fix: make plugin compatible with CLion 2018.1 through 2018.3
 

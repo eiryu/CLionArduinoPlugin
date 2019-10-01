@@ -9,8 +9,8 @@ import com.vladsch.clionarduinoplugin.generators.cmake.commands.*
 import com.vladsch.clionarduinoplugin.resources.TemplateResolver
 import com.vladsch.clionarduinoplugin.resources.resolveRefs
 import com.vladsch.flexmark.util.ast.Node
-import com.vladsch.flexmark.util.options.DataHolder
-import com.vladsch.flexmark.util.options.MutableDataSet
+import com.vladsch.flexmark.util.data.DataHolder
+import com.vladsch.flexmark.util.data.MutableDataSet
 import com.vladsch.flexmark.util.sequence.BasedSequenceImpl
 import com.vladsch.plugin.util.VariableExpander
 import com.vladsch.plugin.util.ifElse
@@ -63,7 +63,7 @@ abstract class CMakeListsTxtBuilder(commands: Array<CMakeCommandType>, anchors: 
 
     val elements: List<CMakeElement>
         get() = myElements
-    
+
     init {
         myCMakeCommands = HashMap()
         myCommands = HashMap()
@@ -155,11 +155,11 @@ abstract class CMakeListsTxtBuilder(commands: Array<CMakeCommandType>, anchors: 
         var erroneousSetProjectNameMacro = ""
         var erroneousSetProjectName = ""
 
-        // if cmake project var name not given, set it to the 
+        // if cmake project var name not given, set it to the
         if (!valueSet.containsValue(PROJECT_VAR_NAME)) {
             valueSet[PROJECT_VAR_NAME] = projectNameMacro.removeSurrounding("\${", "}")
         }
-        
+
         // first get the variable values
         for (node in myCMakeFile!!.children) {
             if (node is Command && node !is CommentedOutCommand) {
@@ -795,7 +795,7 @@ abstract class CMakeListsTxtBuilder(commands: Array<CMakeCommandType>, anchors: 
                             newCommand = CMakeCommand(commandType, argList, false)
                             newCommand.commentOut(false)
                             newCommand.setArgsWithDefaults(argList)
-                            
+
                             replaceElement(command, newCommand)
                         }
                     } else {
@@ -820,7 +820,7 @@ abstract class CMakeListsTxtBuilder(commands: Array<CMakeCommandType>, anchors: 
             }
         }
 
-        // if cmake project var name not given, set it to the 
+        // if cmake project var name not given, set it to the
         if (!valueSet.containsValue(PROJECT_VAR_NAME)) {
             valueSet[PROJECT_VAR_NAME] = outputCMakeProjectNameMacro.removeSurrounding("\${", "}")
         }

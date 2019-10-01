@@ -5,14 +5,13 @@ import com.vladsch.clionarduinoplugin.generators.cmake.ast.CMakeFile;
 import com.vladsch.clionarduinoplugin.generators.cmake.commands.CMakeCommand;
 import com.vladsch.clionarduinoplugin.generators.cmake.commands.CMakeCommandType;
 import com.vladsch.clionarduinoplugin.generators.cmake.commands.CMakeElement;
-import com.vladsch.flexmark.util.IRender;
+import com.vladsch.flexmark.util.ast.IRender;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.spec.IRenderBase;
 import com.vladsch.flexmark.test.DumpSpecReader;
-import com.vladsch.flexmark.util.collection.DynamicDefaultKey;
-import com.vladsch.flexmark.util.options.DataHolder;
-import com.vladsch.flexmark.util.options.DataKey;
-import com.vladsch.flexmark.util.options.MutableDataSet;
+import com.vladsch.flexmark.util.data.DataHolder;
+import com.vladsch.flexmark.util.data.DataKey;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 
 import java.io.IOException;
 import java.util.*;
@@ -26,8 +25,8 @@ class ArduinoCMakeListsTxtBuilderRenderer extends IRenderBase {
         super(options);
     }
 
-    final static public DataKey<Map<String, String>> VALUE_MAP = new DynamicDefaultKey<>("VALUE_MAP", (options) -> new LinkedHashMap<>());
-    final static public DataKey<Set<String>> SUPPRESS_COMMENTED_SET = new DynamicDefaultKey<>("SUPPRESS_COMMENTED_SET", (options) -> new HashSet<>());
+    final static public DataKey<Map<String, String>> VALUE_MAP = new DataKey<>("VALUE_MAP", (options) -> new LinkedHashMap<>());
+    final static public DataKey<Set<String>> SUPPRESS_COMMENTED_SET = new DataKey<>("SUPPRESS_COMMENTED_SET", (options) -> new HashSet<>());
     final static public DataKey<Boolean> DUMP_ELEMENTS_BEFORE = new DataKey<>("DUMP_ELEMENTS_BEFORE", false);
     final static public DataKey<Boolean> DUMP_ELEMENTS_AFTER = new DataKey<>("DUMP_ELEMENTS_AFTER", false);
     final static public DataKey<Boolean> DUMP_VARIABLE_MAP = new DataKey<>("DUMP_VARIABLE_MAP", false);
@@ -143,17 +142,17 @@ class ArduinoCMakeListsTxtBuilderRenderer extends IRenderBase {
             if (RESET_PROJECT_TO_DEFAULTS.getFrom(getOptions())) {
                 builder.setOrAddCommand(CMakeListsTxtBuilder.Companion.getPROJECT()).clearToDefaults();
             }
-            
+
             String contents = builder.getCMakeContents(valueSet, suppressCommented, USE_UNMODIFIED_ORIGINAL.getFrom(cMakeFile));
             output.append(contents);
 
             if (ExtraRenderer.DUMP_OPTIONS.getFrom(cMakeFile)) {
                 // dump the options
-                Map<DataKey, Object> all = ((CMakeFile) node).getAll();
-                ArrayList<DataKey> keys = new ArrayList<>(all.keySet());
+                Map<DataKey<?>, Object> all = ((CMakeFile) node).getAll();
+                ArrayList<DataKey<?>> keys = new ArrayList<>(all.keySet());
                 keys.sort((o1, o2) -> Comparing.compare(o1.getName(), o2.getName()));
 
-                for (DataKey key : keys) {
+                for (DataKey<?> key : keys) {
                     output.append("# ").append(key.getName()).append("->").append(String.valueOf(all.get(key))).append("\n");
                 }
             }

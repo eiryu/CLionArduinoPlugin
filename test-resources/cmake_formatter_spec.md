@@ -843,7 +843,7 @@ endforeach()
 
 .
 foreach ( arg NoSpace Escaped\ Space This Divides Into Five Arguments
-    Escaped\;Semicolon )
+Escaped\;Semicolon )
 message( "${arg}" )
 endforeach()
 .

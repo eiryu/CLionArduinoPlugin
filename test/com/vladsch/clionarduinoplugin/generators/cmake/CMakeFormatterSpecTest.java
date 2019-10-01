@@ -1,19 +1,19 @@
 package com.vladsch.clionarduinoplugin.generators.cmake;
 
 import com.vladsch.flexmark.spec.SpecExample;
-import com.vladsch.flexmark.spec.SpecReader;
 import com.vladsch.flexmark.test.ComboSpecTestCase;
-import com.vladsch.flexmark.util.options.DataHolder;
-import com.vladsch.flexmark.util.options.MutableDataSet;
+import com.vladsch.flexmark.util.data.DataHolder;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.junit.runners.Parameterized;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class CMakeFormatterSpecTest extends ComboSpecTestCase {
     private static final String SPEC_RESOURCE = "/cmake_formatter_spec.md";
+    public static final String SPEC_FILE_URL = "/Users/vlad/src/projects/CLionArduinoPlugin/test-resources" + SPEC_RESOURCE;
+
     private static final DataHolder OPTIONS = new MutableDataSet()
             .set(CMakeParser.AUTO_CONFIG, false)
             //.set(FormattingRenderer.INDENT_SIZE, 2)
@@ -21,8 +21,7 @@ public class CMakeFormatterSpecTest extends ComboSpecTestCase {
             //.set(Parser.EXTENSIONS, Collections.singleton(FormatterExtension.create()))
             .set(CMakeParser.AST_BLANK_LINES, true)
             .set(CMakeParser.AST_LINE_END_EOL, true)
-            .set(CMakeParser.AST_ARGUMENT_SEPARATORS, true)
-            ;
+            .set(CMakeParser.AST_ARGUMENT_SEPARATORS, true);
 
     private static final Map<String, DataHolder> optionsMap = new HashMap<String, DataHolder>();
     static {
@@ -63,16 +62,7 @@ public class CMakeFormatterSpecTest extends ComboSpecTestCase {
 
     @Parameterized.Parameters(name = "{0}")
     public static List<Object[]> data() {
-        List<SpecExample> examples = SpecReader.readExamples(SPEC_RESOURCE);
-        List<Object[]> data = new ArrayList<Object[]>();
-
-        // NULL example runs full spec test
-        data.add(new Object[] { SpecExample.NULL });
-
-        for (SpecExample example : examples) {
-            data.add(new Object[] { example });
-        }
-        return data;
+        return getTestData(SPEC_RESOURCE, SPEC_FILE_URL);
     }
 
     @Override

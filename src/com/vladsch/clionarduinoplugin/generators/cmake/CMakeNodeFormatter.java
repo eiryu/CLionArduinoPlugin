@@ -5,10 +5,9 @@ import com.vladsch.clionarduinoplugin.generators.cmake.ast.*;
 import com.vladsch.flexmark.formatter.MarkdownWriter;
 import com.vladsch.flexmark.formatter.NodeFormatter;
 import com.vladsch.flexmark.formatter.NodeFormatterContext;
-import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.formatter.CustomNodeFormatter;
 import com.vladsch.flexmark.formatter.NodeFormattingHandler;
-import com.vladsch.flexmark.util.options.DataHolder;
+import com.vladsch.flexmark.util.ast.Node;
+import com.vladsch.flexmark.util.data.DataHolder;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
 import com.vladsch.flexmark.util.sequence.RepeatedCharSequence;
 
@@ -16,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+@SuppressWarnings("MethodMayBeStatic")
 public class CMakeNodeFormatter implements NodeFormatter {
 
     private final CMakeFormatterOptions formatterOptions;
@@ -92,7 +92,7 @@ public class CMakeNodeFormatter implements NodeFormatter {
 
         if (!formatterOptions.preserveLineBreaks) {
             if (formatterOptions.argumentListMaxLine > 0 && formatterOptions.argumentListMaxLine < 1000) {
-                int col = markdown.columnWith(node.getChars(), 0, node.getChars().length());
+                int col = markdown.column() + node.getChars().length();
                 if (col > formatterOptions.argumentListMaxLine) {
                     // we break, parent should have setup indent prefix
                     markdown.line();
@@ -164,80 +164,20 @@ public class CMakeNodeFormatter implements NodeFormatter {
 
     @Override
     public Set<NodeFormattingHandler<?>> getNodeFormattingHandlers() {
-        return new HashSet<NodeFormattingHandler<? extends Node>>(Arrays.asList(
+        return new HashSet<>(Arrays.asList(
                 // Generic unknown node formatter
-                new NodeFormattingHandler<Node>(Node.class, new CustomNodeFormatter<Node>() {
-                    @Override
-                    public void render(Node node, NodeFormatterContext context, MarkdownWriter markdown) {
-                        CMakeNodeFormatter.this.render(node, context, markdown);
-                    }
-                }),
-                new NodeFormattingHandler<BlankLine>(BlankLine.class, new CustomNodeFormatter<BlankLine>() {
-                    @Override
-                    public void render(BlankLine node, NodeFormatterContext context, MarkdownWriter markdown) {
-                        CMakeNodeFormatter.this.render(node, context, markdown);
-                    }
-                }),
-                new NodeFormattingHandler<Command>(Command.class, new CustomNodeFormatter<Command>() {
-                    @Override
-                    public void render(Command node, NodeFormatterContext context, MarkdownWriter markdown) {
-                        CMakeNodeFormatter.this.render(node, context, markdown);
-                    }
-                }),
-                new NodeFormattingHandler<Command>(CommentedOutCommand.class, new CustomNodeFormatter<Command>() {
-                    @Override
-                    public void render(Command node, NodeFormatterContext context, MarkdownWriter markdown) {
-                        CMakeNodeFormatter.this.render(node, context, markdown);
-                    }
-                }),
-                new NodeFormattingHandler<Argument>(Argument.class, new CustomNodeFormatter<Argument>() {
-                    @Override
-                    public void render(Argument node, NodeFormatterContext context, MarkdownWriter markdown) {
-                        CMakeNodeFormatter.this.render(node, context, markdown);
-                    }
-                }),
-                new NodeFormattingHandler<BracketComment>(BracketComment.class, new CustomNodeFormatter<BracketComment>() {
-                    @Override
-                    public void render(BracketComment node, NodeFormatterContext context, MarkdownWriter markdown) {
-                        CMakeNodeFormatter.this.render(node, context, markdown);
-                    }
-                }),
-                new NodeFormattingHandler<CMakeFile>(CMakeFile.class, new CustomNodeFormatter<CMakeFile>() {
-                    @Override
-                    public void render(CMakeFile node, NodeFormatterContext context, MarkdownWriter markdown) {
-                        CMakeNodeFormatter.this.render(node, context, markdown);
-                    }
-                }),
-                new NodeFormattingHandler<LineComment>(LineComment.class, new CustomNodeFormatter<LineComment>() {
-                    @Override
-                    public void render(LineComment node, NodeFormatterContext context, MarkdownWriter markdown) {
-                        CMakeNodeFormatter.this.render(node, context, markdown);
-                    }
-                }),
-                new NodeFormattingHandler<LineEnding>(LineEnding.class, new CustomNodeFormatter<LineEnding>() {
-                    @Override
-                    public void render(LineEnding node, NodeFormatterContext context, MarkdownWriter markdown) {
-                        CMakeNodeFormatter.this.render(node, context, markdown);
-                    }
-                }),
-                new NodeFormattingHandler<Separator>(Separator.class, new CustomNodeFormatter<Separator>() {
-                    @Override
-                    public void render(Separator node, NodeFormatterContext context, MarkdownWriter markdown) {
-                        CMakeNodeFormatter.this.render(node, context, markdown);
-                    }
-                }),
-                new NodeFormattingHandler<CommandBlock>(CommandBlock.class, new CustomNodeFormatter<CommandBlock>() {
-                    @Override
-                    public void render(CommandBlock node, NodeFormatterContext context, MarkdownWriter markdown) {
-                        CMakeNodeFormatter.this.render(node, context, markdown);
-                    }
-                }),
-                new NodeFormattingHandler<UnrecognizedInput>(UnrecognizedInput.class, new CustomNodeFormatter<UnrecognizedInput>() {
-                    @Override
-                    public void render(UnrecognizedInput node, NodeFormatterContext context, MarkdownWriter markdown) {
-                        CMakeNodeFormatter.this.render(node, context, markdown);
-                    }
-                })
+                new NodeFormattingHandler<>(Node.class, this::render),
+                new NodeFormattingHandler<>(BlankLine.class, this::render),
+                new NodeFormattingHandler<>(Command.class, this::render),
+                new NodeFormattingHandler<>(CommentedOutCommand.class, this::render),
+                new NodeFormattingHandler<>(Argument.class, this::render),
+                new NodeFormattingHandler<>(BracketComment.class, this::render),
+                new NodeFormattingHandler<>(CMakeFile.class, this::render),
+                new NodeFormattingHandler<>(LineComment.class, this::render),
+                new NodeFormattingHandler<>(LineEnding.class, this::render),
+                new NodeFormattingHandler<>(Separator.class, this::render),
+                new NodeFormattingHandler<>(CommandBlock.class, this::render),
+                new NodeFormattingHandler<>(UnrecognizedInput.class, this::render)
         ));
     }
 }

@@ -7,7 +7,7 @@ import com.vladsch.clionarduinoplugin.generators.cmake.commands.CMakeCommandType
 import com.vladsch.clionarduinoplugin.resources.Strings
 import com.vladsch.clionarduinoplugin.settings.ArduinoApplicationSettingsProxy
 import com.vladsch.clionarduinoplugin.settings.ArduinoProjectFileSettings
-import com.vladsch.flexmark.util.options.DataHolder
+import com.vladsch.flexmark.util.data.DataHolder
 import com.vladsch.plugin.util.getFileContent
 import com.vladsch.plugin.util.plus
 import java.io.File
@@ -246,7 +246,7 @@ class ArduinoCMakeListsTxtBuilder : CMakeListsTxtBuilder {
             }
 
             // Can add our own values to resolve variables
-            // TODO: figure out how to make comments unused false make sense with comments above  
+            // TODO: figure out how to make comments unused false make sense with comments above
             return builder.getCMakeContents(null, !appSettings.isCommentUnusedSettings, unmodifiedOriginalText && builder.canUseUnmodifiedOriginal)
         }
 
@@ -254,7 +254,7 @@ class ArduinoCMakeListsTxtBuilder : CMakeListsTxtBuilder {
          * returns application settings determined from the current project files
          * NOTE: these settings are not an instance of "Official" application settings but a non-persisted copy
          */
-        
+
         @JvmOverloads
         fun loadProjectConfiguration(projectDir: File, altCMakeListsContent: String? = null): ArduinoApplicationSettingsProxy? {
             val cMakeLists = projectDir + Strings.CMAKE_LISTS_FILENAME

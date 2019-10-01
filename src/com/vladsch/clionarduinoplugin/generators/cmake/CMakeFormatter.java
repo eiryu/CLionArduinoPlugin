@@ -2,30 +2,27 @@ package com.vladsch.clionarduinoplugin.generators.cmake;
 
 import com.vladsch.clionarduinoplugin.generators.cmake.ast.CMakeFile;
 import com.vladsch.flexmark.formatter.*;
-import com.vladsch.flexmark.util.IRender;
-import com.vladsch.flexmark.util.ast.Document;
-import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.formatter.Formatter;
 import com.vladsch.flexmark.formatter.internal.FormatterOptions;
-import com.vladsch.flexmark.formatter.FormattingPhase;
-import com.vladsch.flexmark.formatter.MarkdownWriter;
-import com.vladsch.flexmark.formatter.NodeFormatterContext;
-import com.vladsch.flexmark.formatter.NodeFormatterSubContext;
-import com.vladsch.flexmark.formatter.NodeFormattingHandler;
-import com.vladsch.flexmark.formatter.PhasedNodeFormatter;
-import com.vladsch.flexmark.util.collection.DynamicDefaultKey;
-import com.vladsch.flexmark.util.collection.NodeCollectingVisitor;
+import com.vladsch.flexmark.html.renderer.HtmlIdGenerator;
+import com.vladsch.flexmark.html.renderer.LinkType;
+import com.vladsch.flexmark.html.renderer.ResolvedLink;
+import com.vladsch.flexmark.util.ast.Document;
+import com.vladsch.flexmark.util.ast.IRender;
+import com.vladsch.flexmark.util.ast.Node;
+import com.vladsch.flexmark.util.ast.NodeCollectingVisitor;
 import com.vladsch.flexmark.util.collection.SubClassingBag;
-import com.vladsch.flexmark.util.html.FormattingAppendable;
-import com.vladsch.flexmark.util.options.DataHolder;
-import com.vladsch.flexmark.util.options.DataKey;
-import com.vladsch.flexmark.util.options.DataSet;
-import com.vladsch.flexmark.util.options.MutableDataHolder;
-import com.vladsch.flexmark.util.options.MutableDataSet;
+import com.vladsch.flexmark.util.data.DataHolder;
+import com.vladsch.flexmark.util.data.DataKey;
+import com.vladsch.flexmark.util.data.DataSet;
+import com.vladsch.flexmark.util.data.MutableDataHolder;
+import com.vladsch.flexmark.util.data.MutableDataSet;
+import com.vladsch.flexmark.util.html.Attributes;
+import com.vladsch.flexmark.util.html.LineFormattingAppendable;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,24 +31,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.vladsch.flexmark.formatter.Formatter.NULL_ITERABLE;
 
 public class CMakeFormatter implements IRender {
 
     // syntax options
-    final static public DataKey<Set<String>> SPACE_AFTER_COMMAND_NAME = new DynamicDefaultKey<Set<String>>("SPACE_AFTER_COMMAND_NAME", (dataHolder) -> {
-        return new HashSet<>(Arrays.asList(
-                "if",
-                "elseif",
-                //"else",
-                //"endif",
-                "foreach",
-                //"endforeach",
-                "while"
-                //"endwhile"
-        ));
-    });
+    final static public DataKey<Set<String>> SPACE_AFTER_COMMAND_NAME = new DataKey<>("SPACE_AFTER_COMMAND_NAME", (dataHolder) -> new HashSet<>(Arrays.asList(
+            "if",
+            "elseif",
+            //"else",
+            //"endif",
+            "foreach",
+            //"endforeach",
+            "while"
+            //"endwhile"
+    )));
 
     final static public DataKey<Integer> INDENT_SPACES = new DataKey<>("INDENT_SPACES", 4);
     final static public DataKey<String> ARGUMENT_LIST_PREFIX = new DataKey<>("ARGUMENT_LIST_PREFIX", " ");
@@ -101,14 +98,20 @@ public class CMakeFormatter implements IRender {
 
     @Override
     public void render(final Node node, final Appendable output) {
-        CMakeFormatterContext renderer = new CMakeFormatterContext(options, new MarkdownWriter(output, formatterOptions.formatFlags), (CMakeFile) node.getDocument());
+        CMakeFormatterContext renderer = new CMakeFormatterContext(options, new MarkdownWriter(formatterOptions.formatFlags), (CMakeFile) node.getDocument());
+        //renderer.getMarkdown().openPreFormatted(true);
         renderer.render(node);
-        renderer.flush(formatterOptions.maxTrailingBlankLines);
+        //renderer.getMarkdown().closePreFormatted();
+        try {
+            renderer.getMarkdown().appendTo(output, formatterOptions.maxTrailingBlankLines);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static class CMakeFormatterContext extends NodeFormatterSubContext {
         // inner stuff
-        final private Map<Class<?>, NodeFormattingHandler> renderers;
+        final private Map<Class<?>, NodeFormattingHandler<?>> renderers;
         final private CMakeFormatterOptions formatterOptions;
         final private DataHolder options;
         final private CMakeFile document;
@@ -124,16 +127,18 @@ public class CMakeFormatter implements IRender {
             this.options = options == null ? new MutableDataSet() : new MutableDataSet(options);
             this.document = document;
             this.formatterOptions = new CMakeFormatterOptions(options);
-            this.renderers = new HashMap<Class<?>, NodeFormattingHandler>(32);
+            this.renderers = new HashMap<>(32);
             NodeFormatter nodeFormatter = new CMakeNodeFormatter(this.options);
-            final Set<Class> collectNodeTypes = new HashSet<Class>(20);
+            //noinspection rawtypes
+            final Set<Class> collectNodeTypes = new HashSet<>(20);
             this.renderingPhases = new HashSet<FormattingPhase>(FormattingPhase.values().length);
             this.phasedFormatters = new ArrayList<PhasedNodeFormatter>(1);
 
+            //noinspection ThisEscapedInObjectConstruction
             out.setContext(this);
 
             final Set<NodeFormattingHandler<?>> formattingHandlers = nodeFormatter.getNodeFormattingHandlers();
-            for (NodeFormattingHandler nodeType : formattingHandlers) {
+            for (NodeFormattingHandler<?> nodeType : formattingHandlers) {
                 // Overwrite existing renderer
                 renderers.put(nodeType.getNodeType(), nodeType);
             }
@@ -142,17 +147,6 @@ public class CMakeFormatter implements IRender {
             Set<Class<?>> nodeClasses = nodeFormatter.getNodeClasses();
             if (nodeClasses != null) {
                 collectNodeTypes.addAll(nodeClasses);
-            }
-
-            if (nodeFormatter instanceof PhasedNodeFormatter) {
-                Set<FormattingPhase> phases = ((PhasedNodeFormatter) nodeFormatter).getFormattingPhases();
-                if (phases != null) {
-                    if (phases.isEmpty()) throw new IllegalStateException("PhasedNodeFormatter with empty Phases");
-                    this.renderingPhases.addAll(phases);
-                    this.phasedFormatters.add((PhasedNodeFormatter) nodeFormatter);
-                } else {
-                    throw new IllegalStateException("PhasedNodeFormatter with null Phases");
-                }
             }
 
             // collect nodes of interest from document
@@ -172,7 +166,6 @@ public class CMakeFormatter implements IRender {
 
         @Override
         public final Iterable<? extends Node> nodesOfType(final Collection<Class<?>> classes) {
-            //noinspection unchecked
             return collectedNodes == null ? NULL_ITERABLE : collectedNodes.itemsOfType(Node.class, classes);
         }
 
@@ -183,12 +176,11 @@ public class CMakeFormatter implements IRender {
 
         @Override
         public final Iterable<? extends Node> reversedNodesOfType(final Collection<Class<?>> classes) {
-            //noinspection unchecked
             return collectedNodes == null ? NULL_ITERABLE : collectedNodes.reversedItemsOfType(Node.class, classes);
         }
 
         @Override
-        public NodeFormatterContext getSubContext(Appendable out) {
+        public NodeFormatterContext getSubContext() {
             //MarkdownWriter writer = new MarkdownWriter(out, getMarkdown().getOptions());
             //writer.setContext(this);
             ////noinspection ReturnOfInnerClass
@@ -201,6 +193,51 @@ public class CMakeFormatter implements IRender {
             renderNode(node, this);
         }
 
+        @Override
+        public void addExplicitId(final Node node, final String id, final NodeFormatterContext context, final MarkdownWriter markdown) {
+
+        }
+
+        @Override
+        public HtmlIdGenerator getIdGenerator() {
+            return null;
+        }
+
+        @Override
+        public void postProcessNonTranslating(final Function<String, CharSequence> postProcessor, final Runnable scope) {
+
+        }
+
+        @Override
+        public <T> T postProcessNonTranslating(final Function<String, CharSequence> postProcessor, final Supplier<T> scope) {
+            return null;
+        }
+
+        @Override
+        public boolean isPostProcessingNonTranslating() {
+            return false;
+        }
+
+        @Override
+        public MergeContext getMergeContext() {
+            return null;
+        }
+
+        @Override
+        public String encodeUrl(final CharSequence sequence) {
+            return null;
+        }
+
+        @Override
+        public ResolvedLink resolveLink(final LinkType type, final CharSequence sequence, final Boolean aBoolean) {
+            return null;
+        }
+
+        @Override
+        public ResolvedLink resolveLink(final LinkType type, final CharSequence sequence, final Attributes attributes, final Boolean aBoolean) {
+            return null;
+        }
+
         void renderNode(Node node, NodeFormatterSubContext subContext) {
             if (node instanceof Document) {
                 // here we render multiple phases
@@ -209,7 +246,7 @@ public class CMakeFormatter implements IRender {
                     this.phase = phase;
                     // here we render multiple phases
                     if (this.phase == FormattingPhase.DOCUMENT) {
-                        NodeFormattingHandler nodeRenderer = renderers.get(node.getClass());
+                        NodeFormattingHandler<?> nodeRenderer = renderers.get(node.getClass());
                         if (nodeRenderer != null) {
                             subContext.setRenderingNode(node);
                             nodeRenderer.render(node, subContext, subContext.getMarkdown());
@@ -227,7 +264,7 @@ public class CMakeFormatter implements IRender {
                     }
                 }
             } else {
-                NodeFormattingHandler nodeRenderer = renderers.get(node.getClass());
+                NodeFormattingHandler<?> nodeRenderer = renderers.get(node.getClass());
 
                 if (nodeRenderer == null) {
                     nodeRenderer = renderers.get(Node.class);
@@ -329,14 +366,14 @@ public class CMakeFormatter implements IRender {
                         } else {
                             // need to set pre-formatted or spaces after eol are ignored assuming prefixes are used
                             int saved = markdown.getOptions();
-                            markdown.setOptions(saved | FormattingAppendable.ALLOW_LEADING_WHITESPACE);
+                            markdown.setOptions((saved & ~LineFormattingAppendable.COLLAPSE_WHITESPACE) | LineFormattingAppendable.ALLOW_LEADING_WHITESPACE);
                             markdown.append(sequence);
                             markdown.setOptions(saved);
                         }
                     }
                 } else {
                     // nodes reversed due to children being rendered before the parent
-                }    
+                }
             }
         }
 

@@ -2,13 +2,13 @@ package com.vladsch.clionarduinoplugin.generators.cmake;
 
 import com.intellij.openapi.util.Comparing;
 import com.vladsch.clionarduinoplugin.generators.cmake.ast.CMakeFile;
-import com.vladsch.flexmark.util.IRender;
+import com.vladsch.flexmark.util.ast.IRender;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.spec.IRenderBase;
 import com.vladsch.flexmark.util.Pair;
-import com.vladsch.flexmark.util.options.DataHolder;
-import com.vladsch.flexmark.util.options.DataKey;
-import com.vladsch.flexmark.util.options.MutableDataSet;
+import com.vladsch.flexmark.util.data.DataHolder;
+import com.vladsch.flexmark.util.data.DataKey;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
 
 import java.io.IOException;
@@ -49,11 +49,11 @@ class ExtraRenderer extends IRenderBase {
 
             if (DUMP_OPTIONS.getFrom(getOptions())) {
                 // dump the options
-                Map<DataKey, Object> all = ((CMakeFile) node).getAll();
-                ArrayList<DataKey> keys = new ArrayList<>(all.keySet());
+                Map<DataKey<?>, Object> all = ((CMakeFile) node).getAll();
+                ArrayList<DataKey<?>> keys = new ArrayList<>(all.keySet());
                 keys.sort((o1,o2)->Comparing.compare(o1.getName(),o2.getName()));
 
-                for (DataKey key:keys) {
+                for (DataKey<?> key:keys) {
                     output.append(key.getName()).append("->").append(String.valueOf(all.get(key))).append("\n");
                 }
             }
