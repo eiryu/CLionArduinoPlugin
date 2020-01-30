@@ -3,7 +3,6 @@
     <output-path>$PROJECT_DIR$/out/artifacts</output-path>
     <root id="archive" name="CLionArduinoPlugin.jar">
       <element id="module-output" name="CLionArduinoPlugin" />
-      <element id="module-output" name="plugin-util" />
     </root>
   </artifact>
 </component>
