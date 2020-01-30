@@ -102,11 +102,11 @@ object TemplateResolver {
             while (entries.hasMoreElements()) {
                 val jarEntry = entries.nextElement()
                 if (!jarEntry.isDirectory) {
-                    val name = jarEntry.name
-                    //                System.out.println(name)
+                    val name = jarEntry.name.replace("/", File.separator)
+//                    System.out.println(name)
                     if (name.startsWith(prefix)) { //filter according to the path
                         val entry = name.substring(prefix.length)
-                        if (!entry.isEmpty()) {
+                        if (entry.isNotEmpty()) {
                             val stream = jar.getInputStream(jarEntry);
                             val sb = StringBuilder()
                             sb.streamAppend(stream)

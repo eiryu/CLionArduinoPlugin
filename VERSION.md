@@ -4,6 +4,7 @@
 
 ### Version History
 - [TO DO](#to-do)
+- [1.5.1](#151)
 - [1.5.0](#150)
 - [1.4.6](#146)
 - [1.4.4](#144)
@@ -39,6 +40,10 @@
 * [ ] Fix: add logic to allow for absolute additional library paths  
   [ArduinoCMakeListsTxtBuilder.kt: Line 213](https://github.com/vsch/CLionArduinoPlugin/blob/master/src/com/vladsch/clionarduinoplugin/generators/cmake/ArduinoCMakeListsTxtBuilder.kt#L213)
 * [ ] Add: documentation for Windows installation to readme
+
+### 1.5.1
+
+* Fix: add fixes for [#22, Open Existing Project files]
 
 ### 1.5.0
 
