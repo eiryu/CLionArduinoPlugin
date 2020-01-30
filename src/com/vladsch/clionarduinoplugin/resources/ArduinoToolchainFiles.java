@@ -50,6 +50,23 @@ public class ArduinoToolchainFiles {
                                 arduinoToolchainInputStream,
                                 arduinoInputStream);
                     }
+
+                    if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                        String arduinoSdkPathEnv = System.getenv("ARDUINO_SDK_PATH").replace("\\", "/");
+                        String windowsPathsString =
+                                "set(ARDUINO_SDK_PATH \"" + arduinoSdkPathEnv + "\")" + "\r\n" +
+                                        "message(\"ARDUINO_SDK_PATH ${ARDUINO_SDK_PATH}\")" + "\r\n";
+
+                        VirtualFile windowsPaths = platformDirectory.createChildData(this, "WindowsPaths.cmake");
+                        OutputStream windowsPathsOutputStream = windowsPaths.getOutputStream(this);
+                        InputStream windowsPathsInputStream = IOUtils.toInputStream(windowsPathsString);
+
+                        try {
+                            IOUtils.copy(windowsPathsInputStream, windowsPathsOutputStream);
+                        } finally {
+                            closeStreams(windowsPathsOutputStream, windowsPathsInputStream);
+                        }
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

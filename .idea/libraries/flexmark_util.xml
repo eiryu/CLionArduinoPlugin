@@ -5,7 +5,7 @@
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/../flexmark-java/flexmark-util/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../flexmark-java.0.42/flexmark-util/src/main/java" />
     </SOURCES>
   </library>
 </component>

@@ -90,14 +90,14 @@ object TemplateResolver {
          * Adapted from code example by Greg Briggs - http://www.uofr.net/~greg/java/get-resource-listing.html
          */
         if (resource.protocol == "jar" && templatesDir == null) {
-            val jarPath = resource.path.substring(5, resource.path.indexOf("!")) //strip out only the JAR file
+            val jarPath = resource.path.substring(5, resource.path.indexOf("!")).replace("/", File.separator)
             val jar = JarFile(URLDecoder.decode(jarPath, "UTF-8"))
-            baseDir = File(resource.path.substring(5 + 1 + jarPath.length))
+            baseDir = File(resource.path.substring(5 + 1 + jarPath.length).replace("/", File.separator))
             templateDir = baseDir + templateType
 
             val entries = jar.entries() //gives ALL entries in jar
-            val prefix = baseDir.path.substring(1) + File.separator
-            //            System.out.println(prefix)
+            val prefix = baseDir.path.substring(1).replace("/", File.separator) + File.separator
+//            System.out.println(prefix)
 
             while (entries.hasMoreElements()) {
                 val jarEntry = entries.nextElement()
@@ -113,8 +113,8 @@ object TemplateResolver {
                             val entryFile = baseDir + entry
                             templateFiles[entryFile] = sb.toString()
                         }
-                    } else {
-                        //                        System.out.println("Excluding $name")
+//                    } else {
+//                        System.out.println("Excluding $name")
                     }
                 }
             }

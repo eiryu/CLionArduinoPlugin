@@ -4,7 +4,7 @@
 
 ### Version History
 - [TO DO](#to-do)
-- [1.4.9](#149)
+- [1.5.0](#150)
 - [1.4.6](#146)
 - [1.4.4](#144)
 - [1.4.2](#142)
@@ -36,13 +36,15 @@
   * [ ] [Allow setting ARDUINO_SDK_PATH as environment variable]
   * [ ] [Support for ESP32 using Arduino libs]
   * [ ] [Include directories when setting up the library. Added Servo_RECURSE.]
-
-### 1.4.9
-
-* Fix: update for latest flexmark-java lib 0.60.0
 * [ ] Fix: add logic to allow for absolute additional library paths  
   [ArduinoCMakeListsTxtBuilder.kt: Line 213](https://github.com/vsch/CLionArduinoPlugin/blob/master/src/com/vladsch/clionarduinoplugin/generators/cmake/ArduinoCMakeListsTxtBuilder.kt#L213)
 * [ ] Add: documentation for Windows installation to readme
+
+### 1.5.0
+
+* Fix: [#22, Open Existing Project files], unhandled windows path thanks to
+  [@JedrzejczykRobert](https://github.com/JedrzejczykRobert)
+* Fix: update for latest flexmark-java lib 0.60.0
 
 ### 1.4.6
 
@@ -243,4 +245,6 @@
 [arduino-cmake]: https://github.com/queezythegreat/arduino-cmake
 [Include directories when setting up the library. Added Servo_RECURSE.]: https://github.com/francoiscampbell/arduino-cmake/commit/dbd4fe372b9a0120325b429b3ed23c311ab3dc66
 [Support for ESP32 using Arduino libs]: https://github.com/altexdim/arduino-cmake/commit/f21fd1ae0c48583c2b498a24cfa2e65814fff483
+[#22, Open Existing Project files]: https://github.com/vsch/CLionArduinoPlugin/issues/22
+
 
