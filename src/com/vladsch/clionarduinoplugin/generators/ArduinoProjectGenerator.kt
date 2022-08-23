@@ -157,7 +157,8 @@ abstract class ArduinoProjectGenerator(isLibrary: Boolean) : CMakeProjectGenerat
                 libDir.mkdirs()
             }
         }
-        return CreatedFilesHolder(cMakeFile, sourceFiles, nonSourceFiles.toTypedArray(), extraFiles)
+        // TODO cMakeFileがnullの場合の考慮をする
+        return CreatedFilesHolder(cMakeFile!!, sourceFiles, nonSourceFiles.toTypedArray(), extraFiles)
     }
 
     override fun generateProject(project: Project, baseDir: VirtualFile, settings: CMakeProjectSettings, module: Module) {
@@ -171,7 +172,7 @@ abstract class ArduinoProjectGenerator(isLibrary: Boolean) : CMakeProjectGenerat
             return
         }
 
-        CLionProjectWizardUtils.reformatProjectFiles(project, createdFilesHolder.cMakeFile, formatSourceFilesAsCpp(), *createdFilesHolder.sourceFiles)
+        CLionProjectWizardUtils.reformatProjectFiles(project, createdFilesHolder.cMakeFile, *createdFilesHolder.sourceFiles)
         CMakeWorkspace.getInstance(project).selectProjectDir(VfsUtilCore.virtualToIoFile(baseDir))
 
         if (!ApplicationManager.getApplication().isHeadlessEnvironment) {
@@ -184,10 +185,6 @@ abstract class ArduinoProjectGenerator(isLibrary: Boolean) : CMakeProjectGenerat
         val workspace = CMakeWorkspace.getInstance(project)
         val busConnection = project.messageBus.connect()
         busConnection.subscribe(CMakeWorkspaceListener.TOPIC, MyCMakeWorkspaceListener(busConnection, workspace))
-    }
-
-    override fun formatSourceFilesAsCpp(): Boolean {
-        return false
     }
 
     override fun validate(baseDirPath: String): ValidationResult {
