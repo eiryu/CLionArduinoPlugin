@@ -1,3 +1,5 @@
+<!-- Plugin description -->
+
 # <img src="resources/META-INF/pluginIcon.svg" alt="pluginIcon.svg" width="60" align="absmiddle"/> Arduino Support
 
 A JetBrains CLion plugin to integrate
@@ -147,3 +149,4 @@ For serial port list and functionality the plugin uses [jSSC-2.8.0], Licensed un
 [GNU Lesser GPL]: http://www.gnu.org/licenses/lgpl.html
 [jSSC-2.8.0]: https://github.com/scream3r/java-simple-serial-connector
 
+<!-- Plugin description end -->

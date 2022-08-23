@@ -1,1 +1,1 @@
-rootProject.name = "sample-intellij-plugin"
+rootProject.name = "CLionArduinoPlugin"
