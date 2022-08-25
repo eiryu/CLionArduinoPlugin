@@ -47,8 +47,9 @@ public class SerialMonitorToolWindow {
 
     public SerialMonitorToolWindow(Project project) {
         this.project = project;
-        ToolWindowManager.getInstance(project).invokeLater(() -> {
-            toolWindow = ToolWindowManager.getInstance(project).registerToolWindow(TOOL_WINDOW_ID, false, ToolWindowAnchor.BOTTOM, project, true);
+        ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
+        toolWindowManager.invokeLater(() -> {
+            toolWindow = toolWindowManager.registerToolWindow(TOOL_WINDOW_ID, false, ToolWindowAnchor.BOTTOM, project, true);
             toolWindow.setIcon(PluginIcons.serial_port_tool);
 
             //JPanel mainPanel = new JPanel(new BorderLayout());
