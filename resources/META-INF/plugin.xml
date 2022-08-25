@@ -5,7 +5,10 @@
     <vendor email="" url="https://github.com/vsch/CLionArduinoPlugin">Vladimir Schneider</vendor>
 
     <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="181"/>
+    <!--
+        specify by patchPluginXml gradle task
+        <idea-version since-build="181"/>
+    -->
 
     <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -54,7 +57,10 @@
         <p><strong>*</strong> This plugin is a fork of <a href="https://github.com/francoiscampbell/CLionArduinoPlugin">Original CLionArduinoPlugin</a> written by Francois Campbell.</p>
         ]]></description>
 
-    <version>1.5.2</version>
+    <!--
+        specify by patchPluginXml gradle task
+        <version>1.5.2</version>
+    -->
 
     <change-notes><![CDATA[
         <h3>1.5.2</h3>
